@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from Game_Ranking_System.views import LandingView, UserLoginView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", LandingView.as_view()),
+    path('login/', UserLoginView.as_view())
 ]

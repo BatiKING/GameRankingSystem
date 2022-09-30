@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-7^+_=9+t8rj6*6okfow+)g(%7^%l$@6^mwbt*ufov5$00)b--!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+LOGIN_REDIRECT_URL = '/' # URL redirecting after a successful authentication
 
 # Application definition
 
@@ -52,6 +52,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "GRS.urls"
 
+AUTH_USER_MODEL = 'Game_Ranking_System.User'
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -76,9 +78,13 @@ WSGI_APPLICATION = "GRS.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'HOST': '0.0.0.0',
+        'PORT': '5000',
+        'NAME': 'game_ranking_system',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'USER': 'postgres',
+        'PASSWORD': 'tekkentag3',
     }
 }
 
