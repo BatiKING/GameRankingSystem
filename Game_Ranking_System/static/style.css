@@ -68,3 +68,32 @@ body {
     margin-bottom: 5px;
 
 }
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    justify-items: center;
+
+}
+
+.logo-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    white-space: nowrap;
+}
+.user-buttons-container {
+    width: 10%;
+}
+
+.main-menu-container {
+    width: 100%;
+    align-self: center;
+    display: flex;
+    justify-content: center;
+
+}

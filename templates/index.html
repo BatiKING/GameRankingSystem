@@ -1,20 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Welcome to GRS{% endblock %}
 {% block content %}
-    <div class="landing-container">
-        <div class="landing-container-top">
-            <a class="btn btn-primary" href="#" role="button">Login</a>
+    {% if user.is_authenticated %}
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="user-buttons-container"></div>
+                <h1>GRS - GAME RANKING SYSTEM</h1>
+                <div class="user-buttons-container">
+                    bell | user
+                </div>
+            </div>
+
+            <div class="main-menu-container">
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item"><a href="/">Public scoreboard</a></li>
+                    <li class="list-group-item"><a href="personal/">Personal scoreboard</a></li>
+                    <li class="list-group-item">Rankings</li>
+                    <li class="list-group-item">Add Public score</li>
+                    <li class="list-group-item">Add Personal score</li>
+                </ul>
+            </div>
         </div>
-        <div class="landing-container-mid">
-            <h4 style="text-align: center">Join the community of competitive players, and register now!<br>
-                GRS lets you keep track of your score and compare your results with others.<br>
-                Completly free!
-            </h4>
+    {% else %}
+        <div class="landing-container">
+            <div class="logo-container">
+                <h1>GRS - GAME RANKING SYSTEM</h1>
+            </div>
+
+            <div class="landing-container-top">
+                <a class="btn btn-primary" href="{% url 'login' %}" role="button">Login</a>
+            </div>
+            <div class="landing-container-mid">
+                <h4 style="text-align: center">Join the community of competitive players, and register now!<br>
+                    GRS lets you keep track of your score and compare your results with others.<br>
+                    Completly free!
+                </h4>
+            </div>
+            <div class="landing-container-bot">
+                <h4>Join now!</h4> <a class="btn btn-primary" href="{% url 'signup' %}" role="button">Sign-up</a>
+            </div>
+
         </div>
-        <div class="landing-container-bot">
-            <h4>Join now!</h4> <a class="btn btn-primary" href="#" role="button">Register</a>
-        </div>
-    </div>
+    {% endif %}
 
     <div class="score-board-container">
         <div class="score-board-header">
@@ -28,10 +55,9 @@
 
                 {% for match in matches %}
                     <div class="score-board-table-row">
-{#                    <div class="score-board-table-row">#}
-
-                        {{ match.score.p1_character }} - {{ match.score.p1_id.nickname }} - {{ match.score.p1_score }}
-                        VS {{ match.score.p2_score }} - {{ match.score.p2_id.nickname }} - {{ match.score.p2_character }}
+                        {{ match.p1_character }} - {{ match.p1_id.nickname }} - {{ match.p1_score }}
+                        VS {{ match.p2_score }} - {{ match.p2_id.nickname }}
+                        - {{ match.p2_character }}
                     </div>
                 {% endfor %}
 
