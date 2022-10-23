@@ -54,6 +54,16 @@ body {
     padding-bottom: 20px;
 }
 
+.score-board-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.score-board-header {
+    display: flex;
+    justify-content: center;
+}
 .score-board-table {
     display: flex;
     flex-direction: column;
@@ -95,5 +105,10 @@ body {
     align-self: center;
     display: flex;
     justify-content: center;
+
+}
+.filter-sorting-navigation {
+    display: flex;
+    justify-content: start;
 
 }

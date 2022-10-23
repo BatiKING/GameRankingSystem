@@ -15,10 +15,25 @@ class LandingView(View):
         # PublicScore.objects.create(score=new_score, game_title_id_id=1, game_mode_id_id=1, creator_id_id=1,
         #                            opponent_id_id=2, score_confirmed=True)
 
-        public_scores = Score.objects.all()
+        public_scores = Score.objects.filter(public_score=True)
 
         ctx = {
-            'matches': public_scores
+            'matches': public_scores,
+            'board_type': "Public Score board"
+        }
+        return render(request, "index.html", ctx)
+
+
+class PersonalScoreView(View):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect("home")
+
+        personal_score = Score.objects.filter(p1_id__username=request.user.username)
+
+        ctx = {
+            'matches': personal_score,
+            'board_type': "Personal Score board"
         }
         return render(request, "index.html", ctx)
 

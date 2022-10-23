@@ -7,17 +7,18 @@
                 <div class="user-buttons-container"></div>
                 <h1>GRS - GAME RANKING SYSTEM</h1>
                 <div class="user-buttons-container">
-                    bell | user
+                    <h4><i class="bi bi-bell"></i>
+                        <i class="bi bi-person-circle"></i></h4>
                 </div>
             </div>
 
             <div class="main-menu-container">
-                <ul class="list-group list-group-horizontal">
-                    <li class="list-group-item"><a href="/">Public scoreboard</a></li>
-                    <li class="list-group-item"><a href="personal/">Personal scoreboard</a></li>
-                    <li class="list-group-item">Rankings</li>
-                    <li class="list-group-item">Add Public score</li>
-                    <li class="list-group-item">Add Personal score</li>
+                <ul class="nav">
+                    <li class="nav-item"><a class="nav-link" href="/">Public scoreboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="personal/">Personal scoreboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="ranking/">Rankings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add_public/">Add Public score</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add_personal">Add Personal score</a></li>
                 </ul>
             </div>
         </div>
@@ -45,23 +46,59 @@
 
     <div class="score-board-container">
         <div class="score-board-header">
-            <h2>Public Score board</h2>
+            <h2>{{board_type}}</h2>
         </div>
         <div class="score-board-filters-sorting">
-            <h3>Filter | Sorting | Game | etc.</h3>
+            <div class="filter-sorting-navigation">
+                <ul class="nav">
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="collapse" href="#collapseFilter" role="button" aria-expanded="false" aria-controls="collapseExample">Filter & Sort</a></li>
+                </ul>
+            </div>
+            <div class="collapse" id="collapseFilter">
+                <div class="">
+                    <form method="get" action="">
+                        <input class="form-control" type="text" name="test">
+                        <input type="submit" value="filter">
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="score-board-content">
-            <div class="score-board-table">
 
+
+        <div class="score-board-content">
+            <table class="table table-striped table-bordered">
+            <thead>
+                <tr class="table-bordered">
+                    <th class="table-primary text-center">P1 Character</th>
+                    <th class="table-primary text-center">P1 Nickname</th>
+                    <th class="table-primary text-center">P1 Score</th>
+                    <th class="table-primary text-center">VS</th>
+                    <th class="table-primary text-center">P2 Score</th>
+                    <th class="table-primary text-center">P2 Nickname</th>
+                    <th class="table-primary text-center">P2 Character</th>
+                </tr>
+            </thead>
                 {% for match in matches %}
-                    <div class="score-board-table-row">
-                        {{ match.p1_character }} - {{ match.p1_id.nickname }} - {{ match.p1_score }}
-                        VS {{ match.p2_score }} - {{ match.p2_id.nickname }}
-                        - {{ match.p2_character }}
+                    <tr>
+                        <td colspan="7" class="table-primary text-center">{{ match.game_title_id.title }} - {{ match.game_mode_id.mode }}</td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="table-primary text-center">{{ match.p1_character }} </td>
+                        <td class="table-primary text-center">{{ match.p1_id.nickname }} </td>
+                        <td class="table-primary text-center">{{ match.p1_score }}</td>
+                        <td class="table-primary text-center">VS</td>
+                        <td class="table-primary text-center">{{ match.p2_score }} </td>
+                        <td class="table-primary text-center">{{ match.p2_id.nickname }}</td>
+                        <td class="table-primary text-center">{{ match.p2_character }}</td>
+                    </tr>
+                {% empty %}
+                    </table>
+                    <div class="alert alert-danger">
+                        <h3>No matches found.</h3>
                     </div>
                 {% endfor %}
 
-            </div>
+            </table>
         </div>
     </div>
 

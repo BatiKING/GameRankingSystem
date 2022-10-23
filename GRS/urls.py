@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Game_Ranking_System.views import LandingView, UserLoginView, SignupView
+from Game_Ranking_System.views import LandingView, UserLoginView, SignupView, PersonalScoreView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", LandingView.as_view(), name='home'),
     path('login/', UserLoginView.as_view(), name='login'),
-    path('signup/', SignupView.as_view(), name='signup')
+    path('signup/', SignupView.as_view(), name='signup'),
+    path('personal/', PersonalScoreView.as_view(), name='personal')
 ]
