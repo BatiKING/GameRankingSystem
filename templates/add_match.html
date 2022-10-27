@@ -4,12 +4,17 @@
 {% block content %}
 <html>
     <head>
-        <title>LoginView</title>
+        <title>Submit your score</title>
 
     </head>
 
     <body>
-    <h2>Login</h2>
+    <h2>Submit your {{ match_type }} score</h2>
+    {% if add_match_error %}
+          <div class="alert alert-danger" role="alert">
+          {{ add_match_error }}
+          </div>
+      {% endif %}
 <form method="POST">{% csrf_token %}
 
 <!-- form variable -->

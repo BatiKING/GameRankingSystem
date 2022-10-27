@@ -3,22 +3,42 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    nickname = models.CharField(max_length=150, null=False, default='')
+    nickname = models.CharField(max_length=150, null=False, default='', unique=True)
     pass
+
+    def __unicode__(self):
+        return self.nickname
+
+    def __str__(self):
+        return self.nickname
 
 
 class GameMode(models.Model):
     mode = models.CharField(max_length=150)
+    public_allowed = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.mode
+
+    def __str__(self):
+        return self.mode
 
 
 class GameTitle(models.Model):
     title = models.CharField(max_length=150)
     mode = models.ManyToManyField(GameMode)
+    public_allowed = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.title
+
+    def __str__(self):
+        return self.title
 
 
 class Score(models.Model):
     p1_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='creator_id')
-    p2_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='opponent_id')
+    p2_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='opponent_id', null=True)
     p1_score = models.IntegerField(null=False)
     p2_score = models.IntegerField(null=False)
     p1_character = models.CharField(max_length=150)
@@ -26,7 +46,6 @@ class Score(models.Model):
     date_time_created = models.DateTimeField(auto_now=True)
     game_title_id = models.ForeignKey(GameTitle, on_delete=models.CASCADE)
     game_mode_id = models.ForeignKey(GameMode, on_delete=models.CASCADE)
-    score_confirmed = models.BooleanField()
+    score_confirmed = models.BooleanField(default=False)
     public_score = models.BooleanField(default=False)
-
-
+    personal_opponent_nickname = models.CharField(max_length=150, null=True)

@@ -1,14 +1,30 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from Game_Ranking_System.models import User
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from Game_Ranking_System.models import User, Score, GameMode, GameTitle
+from django.utils.translation import gettext, gettext_lazy as _
+from django.contrib.auth import (
+    authenticate, get_user_model, password_validation, )
 
 
-class LoginForm(forms.Form):
-    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={"class": "form-control"}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), )
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update(
+            {'class': 'form-control'}
+        )
+        self.fields['password'].widget.attrs.update(
+            {'class': 'form-control'}
+        )
+    # username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={"class": "form-control"}))
+    # password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), )
 
 
 class SignUpForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs["class"] = "form-control"
+        self.fields['password2'].widget.attrs["class"] = "form-control"
+
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.',
                                  widget=forms.TextInput(attrs={"class": "form-control"}))
     last_name = forms.CharField(max_length=30, required=False, help_text='Optional.',
@@ -21,10 +37,88 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'nickname', 'password1', 'password2',)
-        widgets = {'username': forms.TextInput(attrs={"class": "form-control"}),
-                   'first_name': forms.TextInput(attrs={"class": "form-control"}),
-                   'last_name': forms.TextInput(attrs={"class": "form-control"}),
-                   'email': forms.TextInput(attrs={"class": "form-control"}),
-                   'nickname': forms.TextInput(attrs={"class": "form-control"}),
-                   'password1': forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control'}),
-                   'password2': forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control'})}
+        widgets = {'username': forms.TextInput(attrs={"class": "form-control"}), }
+
+
+class AddPublicMatchSelectGameForm(forms.Form):
+    add_public_game_title_id = forms.ModelChoiceField(queryset=GameTitle.objects.filter(public_allowed=True),
+                                                      widget=forms.Select(attrs={'class': 'form-select'}),
+                                                      label="Game title")
+
+
+class AddPublicMatchForm(forms.ModelForm):
+    dummy_game_title = forms.ModelChoiceField(queryset=None, label="Game title", blank=True, required=False)
+
+    def __init__(self, current_user, game_title_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['p2_id'].widget.attrs["class"] = "form-select"
+        self.fields['p1_score'].widget.attrs["class"] = "form-control"
+        self.fields['p1_score'].widget.attrs["type"] = "number"
+        self.fields['p1_score'].widget.attrs["min"] = "0"
+        self.fields['p2_score'].widget.attrs["class"] = "form-control"
+        self.fields['p2_score'].widget.attrs["type"] = "number"
+        self.fields['p2_score'].widget.attrs["min"] = "0"
+        self.fields['p1_character'].widget.attrs["class"] = "form-control"
+        self.fields['p2_character'].widget.attrs["class"] = "form-control"
+        self.fields['game_title_id'].widget.attrs["class"] = "form-select"
+        self.fields['game_mode_id'].widget.attrs["class"] = "form-select"
+        self.fields['game_mode_id'].queryset = self.fields['game_mode_id'].queryset.filter(
+            gametitle=game_title_id).filter(public_allowed=True)
+        self.fields['game_title_id'].queryset = self.fields['game_title_id'].queryset.filter(id=game_title_id)
+        self.initial['game_title_id'] = self.fields['game_title_id'].queryset.filter(id=game_title_id).first()
+        self.fields['game_title_id'].widget = forms.HiddenInput()
+        self.fields['dummy_game_title'].queryset = self.fields['game_title_id'].queryset.filter(id=game_title_id)
+        self.fields['dummy_game_title'].widget.attrs["class"] = "form-select"
+        self.initial['dummy_game_title'] = self.fields['game_title_id'].queryset.filter(id=game_title_id).first()
+        self.fields['dummy_game_title'].widget.attrs["disabled"] = True
+        self.fields['p2_id'].queryset = self.fields['p2_id'].queryset.exclude(id=current_user.id)
+
+        self.fields['p2_id'].label = 'Opponents nickname'
+        self.fields['p1_score'].label = 'Your score'
+        self.fields['p2_score'].label = 'Opponents score'
+        self.fields['p1_character'].label = 'Your character'
+        self.fields['p2_character'].label = 'Opponents character'
+        self.fields['game_title_id'].label = 'Game Title'
+        self.fields['game_mode_id'].label = 'Game Mode'
+
+    class Meta:
+        model = Score
+        fields = ['p2_id', 'p1_score', 'p2_score', 'p1_character', 'p2_character', 'game_title_id',
+                  'game_mode_id', 'score_confirmed', 'public_score']
+        exclude = ['p1_id', 'score_confirmed', 'public_score']
+
+
+class AddPersonalMatchForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.fields['p1_id'].widget.attrs["class"] = "form-select"
+        self.fields['personal_opponent_nickname'].widget.attrs["class"] = "form-control"
+        self.fields['p1_score'].widget.attrs["class"] = "form-control"
+        self.fields['p1_score'].widget.attrs["type"] = "number"
+        self.fields['p1_score'].widget.attrs["min"] = "0"
+        self.fields['p2_score'].widget.attrs["class"] = "form-control"
+        self.fields['p2_score'].widget.attrs["type"] = "number"
+        self.fields['p2_score'].widget.attrs["min"] = "0"
+        self.fields['p1_character'].widget.attrs["class"] = "form-control"
+        self.fields['p2_character'].widget.attrs["class"] = "form-control"
+        self.fields['game_title_id'].widget.attrs["class"] = "form-select"
+        self.fields['game_mode_id'].widget.attrs["class"] = "form-select"
+        # self.fields['score_confirmed'].widget.attrs["class"] = "form-check"
+        # self.fields['public_score'].widget.attrs["class"] = "form-check"
+        self.fields['game_title_id'].widget = forms.TextInput(attrs={"class": "form-control"})
+        self.fields['game_mode_id'].widget = forms.TextInput(attrs={"class": "form-control"})
+
+        self.fields['personal_opponent_nickname'].label = "Opponent nickname"
+        self.fields['p1_score'].label = 'Your score'
+        self.fields['p2_score'].label = 'Opponents score'
+        self.fields['p1_character'].label = 'Your character'
+        self.fields['p2_character'].label = 'Opponents character'
+        self.fields['game_title_id'].label = 'Game Title'
+        self.fields['game_mode_id'].label = 'Game Mode'
+
+    class Meta:
+        model = Score
+        fields = ['personal_opponent_nickname', 'p1_score', 'p2_score', 'p1_character', 'p2_character', 'game_title_id',
+                  'game_mode_id']
+        exclude = ['p1_id', 'p2_id', 'score_confirmed', 'public_score']

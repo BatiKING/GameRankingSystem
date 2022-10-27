@@ -15,12 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Game_Ranking_System.views import LandingView, UserLoginView, SignupView, PersonalScoreView
+from Game_Ranking_System.views import LandingView, UserLoginView, SignupView, PersonalScoreView, AddPublicMatchView, \
+    AddPersonalMatchView
+from django.contrib.auth import views as auth_views
+from Game_Ranking_System.forms.forms import LoginForm
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", LandingView.as_view(), name='home'),
-    path('login/', UserLoginView.as_view(), name='login'),
+    path('login/', UserLoginView.as_view(authentication_form=LoginForm), name='login'),
     path('signup/', SignupView.as_view(), name='signup'),
-    path('personal/', PersonalScoreView.as_view(), name='personal')
+    path('personal/', PersonalScoreView.as_view(), name='personal'),
+    path('add_public/', AddPublicMatchView.as_view(), name='add_public'),
+    path('add_personal/', AddPersonalMatchView.as_view(), name='add_personal'),
+    path('add_public/', AddPublicMatchView.as_view(), name='ranking'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+
 ]

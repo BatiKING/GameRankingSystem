@@ -52,6 +52,8 @@ body {
     display: flex;
     justify-content: center;
     padding-bottom: 20px;
+    align-items: center;
+
 }
 
 .score-board-container {
