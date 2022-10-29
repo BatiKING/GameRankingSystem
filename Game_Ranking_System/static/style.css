@@ -109,6 +109,11 @@ body {
     justify-content: center;
 
 }
+
+.filter-form-container {
+
+}
+
 .filter-sorting-navigation {
     display: flex;
     justify-content: start;

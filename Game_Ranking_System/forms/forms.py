@@ -4,6 +4,46 @@ from Game_Ranking_System.models import User, Score, GameMode, GameTitle
 from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation, )
+import django_filters
+from django_filters import CharFilter
+
+
+class ScoreFilter(django_filters.FilterSet):
+
+    player_nickname = CharFilter(method='custom_filter_both_nicknames', label='Nickname',
+                                 widget=forms.widgets.TextInput(attrs={'class': 'form-control-sm'}))
+    character = CharFilter(method='custom_filter_both_characters', label='Character',
+                           widget=forms.widgets.TextInput(attrs={'class': 'form-control-sm'}))
+
+    sort_filter = django_filters.OrderingFilter(
+        fields=['date_time_created', 'score_dif'],
+        field_labels={'date_time_created': 'Date added', 'score_dif': "Score difference"},
+        label='Sort',
+
+    )
+
+
+    def __init__(self, *args, **kwargs):
+        super(ScoreFilter, self).__init__(*args, **kwargs)
+        self.filters['game_title_id'].label = "Game"
+        self.filters['game_title_id'].field.widget.attrs.update(
+            {'class': 'form-select-sm'})
+        self.filters['sort_filter'].field.widget.attrs['class'] = 'form-select-sm'
+
+
+    class Meta:
+        model = Score
+        fields = ['game_title_id']
+
+    def custom_filter_both_nicknames(self, queryset, name, value):
+        qs1 = queryset.filter(p1_id__nickname__icontains=value)
+        qs2 = queryset.filter(p2_id__nickname__icontains=value)
+        return qs1 | qs2
+
+    def custom_filter_both_characters(self, queryset, name, value):
+        qs1 = queryset.filter(p1_character__icontains=value)
+        qs2 = queryset.filter(p2_character__icontains=value)
+        return qs1 | qs2
 
 
 class LoginForm(AuthenticationForm):

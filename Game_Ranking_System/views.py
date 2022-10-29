@@ -3,24 +3,30 @@ from django.views import View
 from Game_Ranking_System.models import Score, User, GameMode, GameTitle
 from django.contrib.auth.views import LoginView
 from Game_Ranking_System.forms.forms import LoginForm, SignUpForm, AddPublicMatchForm, AddPersonalMatchForm, \
-    AddPublicMatchSelectGameForm
+    AddPublicMatchSelectGameForm, ScoreFilter
 from django.contrib.auth import logout
 from django.contrib.auth import login, authenticate
+from django.db.models import F
+from django.db.models.functions import Abs
 
 
 # Create your views here.
 class LandingView(View):
+
     def get(self, request):
-        # new_score = Score.objects.create(p1_id_id=1, p2_id_id=2, p1_score=10, p2_score=3, p1_character='Czong',
-        #                                  p2_character='Chuj')
-        # PublicScore.objects.create(score=new_score, game_title_id_id=1, game_mode_id_id=1, creator_id_id=1,
-        #                            opponent_id_id=2, score_confirmed=True)
-
         public_scores = Score.objects.filter(public_score=True).filter(score_confirmed=True)
-
+        public_scores = public_scores.order_by('-date_time_created')
+        public_scores = public_scores.annotate(
+            score_dif=Abs(F('p1_score') - F('p2_score')))
+        score_filter = ScoreFilter(request.GET, queryset=public_scores)
+        public_scores = score_filter.qs
+        # public_scores = public_scores.order_by('-date_time_created')
+        # public_scores = public_scores.annotate(
+        #     score_dif=Abs(F('p1_score') - F('p2_score'))).order_by('-score_dif')
         ctx = {
             'matches': public_scores,
-            'board_type': "Public Score board"
+            'board_type': "Public Score board",
+            'score_filter': score_filter
         }
         return render(request, "score_board.html", ctx)
 
@@ -33,10 +39,15 @@ class PersonalScoreView(View):
         personal_score = Score.objects.filter(p1_id__username=request.user.username) | Score.objects.filter(
             p2_id__username=request.user.username)
         personal_score = personal_score.filter(public_score=False)
-
+        personal_score = personal_score.order_by('-date_time_created')
+        personal_score = personal_score.annotate(
+            score_dif=Abs(F('p1_score') - F('p2_score')))
+        score_filter = ScoreFilter(request.GET, queryset=personal_score)
+        personal_score = score_filter.qs
         ctx = {
             'matches': personal_score,
-            'board_type': "Personal Score board"
+            'board_type': "Personal Score board",
+            'score_filter': score_filter
         }
 
         return render(request, "score_board.html", ctx)

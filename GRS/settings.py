@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'Game_Ranking_System.apps.GameRankingSystemConfig',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
