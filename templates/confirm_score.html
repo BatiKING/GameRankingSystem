@@ -3,14 +3,14 @@
 {% block content %}
     <div class="score-board-container">
         <div class="score-board-header">
-            <h2>{{ board_type }}</h2>
+            <h2>Confirm score</h2>
         </div>
         <div class="score-board-filters-sorting">
             <div class="filter-sorting-navigation">
                 <ul class="nav">
                     <li class="nav-item"><a class="nav-link" data-bs-toggle="collapse" href="#collapseFilter"
-                                            role="button" aria-expanded="false" aria-controls="collapseExample">Filter &
-                        Sort</a></li>
+                                            role="button" aria-expanded="false"
+                                            aria-controls="collapseExample">Filter</a></li>
                 </ul>
             </div>
             <div class="collapse" id="collapseFilter">
@@ -39,8 +39,13 @@
                 </thead>
                 {% for match in matches %}
                     <tr>
-                        <td colspan="7" class="table-primary text-center">{{ match.game_title_id.title }}
+                        <td class="table-primary text-center"><a class="btn btn-danger btn-sm" href="{% url 'delete_score_request' match_id=match.id %}"
+                                                                 role="button" style="margin: 10px">Delete</a></td>
+                        <td colspan="5" class="table-primary text-center">{{ match.game_title_id.title }}
                             - {{ match.game_mode_id.mode }}</td>
+                        <td class="table-primary text-center"><a class="btn btn-success btn-sm"
+                                                                 href="{% url 'confirm_score_request' match_id=match.id %}" role="button"
+                                                                 style="margin: 10px">Confirm</a></td>
                     </tr>
                     <tr class="table-primary">
                         <td class="table-primary text-center">{{ match.p1_character }} </td>
@@ -55,8 +60,13 @@
                         {% endif %}
                         <td class="table-primary text-center">{{ match.p2_character }}</td>
                     </tr>
-                    <tr class="table-primary"><td colspan="7"></td></tr>
-                    <tr><td colspan="7"></td></tr>
+                    <tr class="table-primary">
+                        <td colspan="7"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7"></td>
+                    </tr>
+
                 {% empty %}
                     </table>
                     <div class="alert alert-danger">

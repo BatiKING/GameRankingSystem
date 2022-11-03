@@ -16,19 +16,25 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from Game_Ranking_System.views import LandingView, UserLoginView, SignupView, PersonalScoreView, AddPublicMatchView, \
-    AddPersonalMatchView
+    AddPersonalMatchView, RankingView, ConfirmScoreView, ScoreRequestDeleteView, ScoreRequestConfirmView
 from django.contrib.auth import views as auth_views
 from Game_Ranking_System.forms.forms import LoginForm
+from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", LandingView.as_view(), name='home'),
     path('login/', UserLoginView.as_view(authentication_form=LoginForm), name='login'),
     path('signup/', SignupView.as_view(), name='signup'),
-    path('personal/', PersonalScoreView.as_view(), name='personal'),
-    path('add_public/', AddPublicMatchView.as_view(), name='add_public'),
-    path('add_personal/', AddPersonalMatchView.as_view(), name='add_personal'),
-    path('add_public/', AddPublicMatchView.as_view(), name='ranking'),
+    path('personal/', login_required(PersonalScoreView.as_view()), name='personal'),
+    path('add_public/', login_required(AddPublicMatchView.as_view()), name='add_public'),
+    path('add_personal/', login_required(AddPersonalMatchView.as_view()), name='add_personal'),
+    path('ranking/', login_required(RankingView.as_view()), name='ranking'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+    path('confirm_score/', login_required(ConfirmScoreView.as_view()), name='confirm_score'),
+    path('delete_score_request/<int:match_id>', login_required(ScoreRequestDeleteView.as_view()),
+         name='delete_score_request'),
+    path('confirm_score_request/<int:match_id>', login_required(ScoreRequestConfirmView.as_view()),
+         name='confirm_score_request'),
 
 ]

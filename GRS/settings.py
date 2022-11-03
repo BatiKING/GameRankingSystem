@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 LOGIN_REDIRECT_URL = '/' # URL redirecting after a successful authentication
 
+LOGIN_URL = '/login'
 # Application definition
 
 INSTALLED_APPS = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "GRS.context_processors.extras"
             ],
         },
     },

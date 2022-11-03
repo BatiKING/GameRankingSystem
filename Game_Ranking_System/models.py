@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    """Overriding standard User model in order to add a 'nickname' field"""
+
     nickname = models.CharField(max_length=150, null=False, default='', unique=True)
     pass
 
@@ -14,6 +16,8 @@ class User(AbstractUser):
 
 
 class GameMode(models.Model):
+    """Model holding all used Game Modes and their visibility level"""
+
     mode = models.CharField(max_length=150)
     public_allowed = models.BooleanField(default=False)
 
@@ -25,6 +29,8 @@ class GameMode(models.Model):
 
 
 class GameTitle(models.Model):
+    """Model holding all used Game Titles and their visibility level"""
+
     title = models.CharField(max_length=150)
     mode = models.ManyToManyField(GameMode)
     public_allowed = models.BooleanField(default=False)
@@ -37,6 +43,8 @@ class GameTitle(models.Model):
 
 
 class Score(models.Model):
+    """Model storing the score data"""
+
     p1_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='creator_id')
     p2_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='opponent_id', null=True)
     p1_score = models.IntegerField(null=False)

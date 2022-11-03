@@ -8,7 +8,25 @@ import django_filters
 from django_filters import CharFilter
 
 
+class RankingFilter(django_filters.FilterSet):
+    """Filter for Game title filtration. Used with Ranking and Confirm Pending Score screens"""
+
+    def __init__(self, *args, **kwargs):
+        super(RankingFilter, self).__init__(*args, **kwargs)
+        self.filters['game_title_id'].label = "Game"
+        self.filters['game_title_id'].field.widget.attrs.update(
+            {'class': 'form-select-sm'})
+        self.filters['game_title_id'].field.queryset = self.filters['game_title_id'].field.queryset.filter(
+            public_allowed=True)
+
+    class Meta:
+        model = Score
+        fields = ['game_title_id']
+
+
 class ScoreFilter(django_filters.FilterSet):
+    """Filter class used with the scoreboard template (Public scoreboard and Personal Scoreboard).
+    Allows user to choose Game title, Character name, Player nickname, as well as sort data"""
 
     player_nickname = CharFilter(method='custom_filter_both_nicknames', label='Nickname',
                                  widget=forms.widgets.TextInput(attrs={'class': 'form-control-sm'}))
@@ -22,14 +40,12 @@ class ScoreFilter(django_filters.FilterSet):
 
     )
 
-
     def __init__(self, *args, **kwargs):
         super(ScoreFilter, self).__init__(*args, **kwargs)
         self.filters['game_title_id'].label = "Game"
         self.filters['game_title_id'].field.widget.attrs.update(
             {'class': 'form-select-sm'})
         self.filters['sort_filter'].field.widget.attrs['class'] = 'form-select-sm'
-
 
     class Meta:
         model = Score
@@ -47,6 +63,8 @@ class ScoreFilter(django_filters.FilterSet):
 
 
 class LoginForm(AuthenticationForm):
+    """Login form - updated with css classes"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update(
@@ -55,11 +73,11 @@ class LoginForm(AuthenticationForm):
         self.fields['password'].widget.attrs.update(
             {'class': 'form-control'}
         )
-    # username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={"class": "form-control"}))
-    # password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), )
 
 
 class SignUpForm(UserCreationForm):
+    """Signup form updated with css classes """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['password1'].widget.attrs["class"] = "form-control"
@@ -81,12 +99,16 @@ class SignUpForm(UserCreationForm):
 
 
 class AddPublicMatchSelectGameForm(forms.Form):
+    """Form used in Add Public Score screen - first stage of the form - Game title selection"""
+
     add_public_game_title_id = forms.ModelChoiceField(queryset=GameTitle.objects.filter(public_allowed=True),
                                                       widget=forms.Select(attrs={'class': 'form-select'}),
                                                       label="Game title")
 
 
 class AddPublicMatchForm(forms.ModelForm):
+    """Form used in Add Public Score screen - second stage of the form - all other details"""
+
     dummy_game_title = forms.ModelChoiceField(queryset=None, label="Game title", blank=True, required=False)
 
     def __init__(self, current_user, game_title_id, *args, **kwargs):
@@ -129,6 +151,7 @@ class AddPublicMatchForm(forms.ModelForm):
 
 
 class AddPersonalMatchForm(forms.ModelForm):
+    """Form used in Add Personal Score screen - no restrictions on the Opponent name, game title or game mode"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

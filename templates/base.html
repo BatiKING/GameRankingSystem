@@ -26,8 +26,17 @@
                 </div>
                 <h1>GRS - GAME RANKING SYSTEM</h1>
                 <div class="user-buttons-container">
-                    <h4><i class="bi bi-bell"></i>
-                        <i class="bi bi-person-circle"></i></h4>
+                    {% if pending_scores_to_confirm %}
+                        <h4><a href="{% url 'confirm_score' %}" class="link-dark">
+                            <i class="bi bi-bell-fill" style="margin-right: -10px"><svg style="margin-left: -10px; margin-bottom: -10px" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="5" cy="5" r="4.5" stroke="#32323B" fill="green"/>
+                                </svg>
+                            </i>
+                        </a>
+                    {% else %}
+                        <h4><i class="bi bi-bell"></i></a>
+                    {% endif %}
+                        </h4>
                     <p>{{ user }}</p>
                 </div>
             </div>
@@ -35,10 +44,13 @@
             <div class="main-menu-container">
                 <ul class="nav">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Public scoreboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'personal' %}">Personal scoreboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'personal' %}">Personal scoreboard</a>
+                    </li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'ranking' %}">Rankings</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'add_public' %}">Add Public score</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'add_personal' %}">Add Personal score</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_public' %}">Add Public score</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_personal' %}">Add Personal
+                        score</a></li>
                 </ul>
             </div>
         </div>
@@ -52,14 +64,16 @@
                 {#                <a class="btn btn-primary" href="{% url 'login' %}" role="button">Login</a>#}
             </div>
             <div class="landing-container-mid">
-                <h4 style="text-align: center">Join the community of competitive players, and register now!<br>
+                <h4 style="text-align: center">Join the community of competitive players, and register
+                    now!<br>
                     GRS lets you keep track of your score and compare your results with others.<br>
                     Completly free! Join now!
                 </h4>
 
             </div>
             <div class="landing-container-bot">
-                <a class="btn btn-primary" href="{% url 'signup' %}" role="button" style="margin: 10px">Sign-up</a> <h4> or </h4> <a
+                <a class="btn btn-primary" href="{% url 'signup' %}" role="button" style="margin: 10px">Sign-up</a>
+                <h4> or </h4> <a
                     class="btn btn-primary" href="{% url 'login' %}" role="button" style="margin: 10px">Login</a>
             </div>
 
