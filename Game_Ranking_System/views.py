@@ -6,7 +6,7 @@ from Game_Ranking_System.forms.forms import LoginForm, SignUpForm, AddPublicMatc
     AddPublicMatchSelectGameForm, ScoreFilter, RankingFilter
 from django.contrib.auth import logout
 from django.contrib.auth import login, authenticate
-from django.db.models import F, Case, When, Value, Count, IntegerField, Sum
+from django.db.models import F, Case, When, IntegerField
 from django.db.models.functions import Abs
 
 
@@ -207,22 +207,8 @@ class RankingView(View):
         score_filter = RankingFilter(request.GET, queryset=ranking)
         ranking = score_filter.qs
 
-        ranking_data = {}
-        for match in ranking:
-            if match.p1_id.nickname not in ranking_data:
-                ranking_data[match.p1_id.nickname] = {'wins': 0, 'matches_played': 1}
-            else:
-                ranking_data[match.p1_id.nickname]['matches_played'] += 1
+        ranking_data = self.get_ranking_data(ranking)
 
-            if match.p2_id.nickname not in ranking_data:
-                ranking_data[match.p2_id.nickname] = {'wins': 0, 'matches_played': 1}
-            else:
-                ranking_data[match.p2_id.nickname]['matches_played'] += 1
-
-            if match.p1_win:
-                ranking_data[match.p1_id.nickname]['wins'] += 1
-            else:
-                ranking_data[match.p2_id.nickname]['wins'] += 1
         order_list = [(values['wins'], nick) for nick, values in ranking_data.items() if values['wins'] > 0]
 
         order_list.sort(reverse=True)
@@ -250,6 +236,26 @@ class RankingView(View):
         }
         return render(request, "ranking.html", ctx)
 
+    @staticmethod
+    def get_ranking_data(ranking):
+        ranking_data = {}
+        for match in ranking:
+            if match.p1_id.nickname not in ranking_data:
+                ranking_data[match.p1_id.nickname] = {'wins': 0, 'matches_played': 1}
+            else:
+                ranking_data[match.p1_id.nickname]['matches_played'] += 1
+
+            if match.p2_id.nickname not in ranking_data:
+                ranking_data[match.p2_id.nickname] = {'wins': 0, 'matches_played': 1}
+            else:
+                ranking_data[match.p2_id.nickname]['matches_played'] += 1
+
+            if match.p1_win:
+                ranking_data[match.p1_id.nickname]['wins'] += 1
+            else:
+                ranking_data[match.p2_id.nickname]['wins'] += 1
+        return ranking_data
+
 
 class ConfirmScoreView(View):
     """View used to allow user confirm or reject a pending public match result submitted by another user"""
@@ -259,9 +265,6 @@ class ConfirmScoreView(View):
 
         score_filter = RankingFilter(request.GET, queryset=matches)
         matches = score_filter.qs
-
-        if score_filter.form.cleaned_data['game_title_id']:
-            sort_game = f": {score_filter.form.cleaned_data['game_title_id']}"
 
         ctx = {
             'matches': matches,
