@@ -6,6 +6,8 @@ import pytest
 
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
 def test_if_personal_score_added(client, dummy_users):
+    """Test validating if Personal Score is added correctly via POST form"""
+
     client.force_login(user=User.objects.first())
     client.post(reverse('add_personal'), {'personal_opponent_nickname': 'TestOpponent1', 'p1_score': 10, 'p2_score': 4,
                                           'p1_character': 'TestChar1', 'p2_character': 'TestChar2',
@@ -17,6 +19,8 @@ def test_if_personal_score_added(client, dummy_users):
 
 
 def test_if_unknown_user_gets_redirected(client):
+    """Test validating if un-logged users are redirected from views they shouldn't access"""
+
     response = client.get(reverse('personal'))
     assert response.status_code == 302
     response = client.get(reverse('add_public'))
@@ -35,6 +39,8 @@ def test_if_unknown_user_gets_redirected(client):
 
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
 def test_ranking_view(client, dummy_game_modes, dummy_game_titles, dummy_users, score_queryset):
+    """Test validating is number of users displayed in the ranking view is correct"""
+
     # client.login(username='TestUser1', password='TestPass1')
     client.force_login(user=User.objects.first())
     response = client.get(reverse('ranking'))
@@ -44,6 +50,8 @@ def test_ranking_view(client, dummy_game_modes, dummy_game_titles, dummy_users, 
 
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
 def test_score_model(dummy_game_modes, dummy_game_titles, dummy_users, score_queryset):
+    """Test validating if Score objects are inserted into the database as expected"""
+
     for obj in score_queryset:
         assert obj == Score.objects.get(pk=obj.pk)
 
@@ -84,5 +92,7 @@ TEST_DATA_FOR_ASSERTION = (
 
 @pytest.mark.parametrize("ranking_input, ranking_output", TEST_DATA_FOR_ASSERTION)
 def test_get_ranking_data(ranking_input, ranking_output):
+    """Test validating if mapping score queryset to ranking data works as expected"""
+
     rv = RankingView.get_ranking_data(ranking_input)
     assert rv == ranking_output
